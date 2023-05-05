@@ -8,3 +8,9 @@ solc = "0.8.19"
 remappings = [
   "@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/"
 ]
+
+[rpc_endpoints]
+mumbai = "${MUMBAI_RPC_URL}"
+
+[etherscan]
+mumbai = { key = "${ETHERSCAN_API_KEY}" }

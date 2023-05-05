@@ -12,11 +12,13 @@ contract MessageEditableTest is Test {
     assertEq(instance.message(), _msg1);
     assertEq(instance.supportsInterface(type(IMessage).interfaceId), true);
     assertEq(instance.supportsInterface(type(IMessageEditable).interfaceId), true);
+    assertEq(instance.lastEdited(), 0);
 
     vm.expectEmit(true, true, false, true);
     emit MessageChanged(_msg1, _msg2);
     instance.editMessage(_msg2);
     assertEq(instance.message(), _msg2);
+    assertEq(instance.lastEdited(), block.timestamp);
   }
 
   function testFailMessageEditable(string memory _msg1, string memory _msg2) public {

@@ -20,6 +20,7 @@ contract MessageEditable is Ownable, Message {
 
   function editMessage(string memory newValue) external onlyOwner {
     emit MessageChanged(message, newValue);
+    lastEdited = block.timestamp;
     message = newValue;
   }
 }
