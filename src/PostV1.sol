@@ -26,12 +26,12 @@ contract PostV1 is MessageEditable, AllowRepliesStatus {
 contract PostV1Factory {
   event NewPost(address indexed post, address indexed parent);
 
-  function createNew(string memory message, IAllowReplies parent) external returns(PostV1 created) {
+  function createNew(string memory message, address parent) external returns(PostV1 created) {
     created = new PostV1(message, msg.sender);
-    emit NewPost(address(created), address(parent));
+    emit NewPost(address(created), parent);
 
-    if(address(parent) != address(0)) {
-      parent.addReply(address(created));
+    if(parent != address(0)) {
+      IAllowReplies(parent).addReply(address(created));
     }
   }
 }

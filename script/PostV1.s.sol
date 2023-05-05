@@ -12,7 +12,7 @@ contract Deploy is Script {
 
     PostV1Factory factory = new PostV1Factory();
     // Create a post so that all posts have a verified contract
-    factory.createNew("Hello", IAllowReplies(address(0)));
+    factory.createNew("Hello", address(0));
 
     // The browser will be used too
     new ReplyStatusBrowser();
