@@ -88,7 +88,7 @@ contract PostBrowser {
       out = fetcher.fetchReplies(post, startIndex, fetchCount, reverseScan);
       for(uint j = 0; j < out.items.length; j++) {
         IFetch.Property[] memory otherProps = properties(out.items[j].item);
-        IFetchReplies.Property[] memory combinedProps = new IFetchReplies.Property[](otherProps.length + out.items[j].props.length);
+        IFetchReplies.Property[] memory combinedProps = new IFetchReplies.Property[](otherProps.length + out.items[j].props.length + 1);
         uint index;
         for(uint k = 0; k < out.items[j].props.length; k++) {
           combinedProps[index++] = out.items[j].props[k];
@@ -98,6 +98,9 @@ contract PostBrowser {
           combinedProps[index].value = otherProps[k].value;
           combinedProps[index++].valueType = otherProps[k].valueType;
         }
+        combinedProps[index].key = "matchingInterfaces";
+        combinedProps[index].valueType="bytes4[]";
+        combinedProps[index].value = abi.encodePacked(matchingInterfaces(out.items[j].item));
         out.items[j].props = combinedProps;
       }
       return out;

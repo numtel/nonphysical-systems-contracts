@@ -27,7 +27,7 @@ contract PostBrowserTest is Test {
 
     IFetchReplies.RepliesResponse memory result = browser.fetchReplies(address(root), 0, 10, false);
     assertEq(result.items.length, 1);
-    assertEq(result.items[0].props.length, 3);
+    assertEq(result.items[0].props.length, 4);
     assertEq(result.items[0].props[0].key, "status");
     assertEq(result.items[0].props[0].valueType, "int32");
     assertEq(int32(uint32(bytes4(result.items[0].props[0].value))), status1);
@@ -37,6 +37,13 @@ contract PostBrowserTest is Test {
     assertEq(result.items[0].props[2].key, "created");
     assertEq(result.items[0].props[2].valueType, "uint256");
     assertEq(uint256(bytes32(result.items[0].props[2].value)), block.timestamp);
+    assertEq(result.items[0].props[3].key, "matchingInterfaces");
+    assertEq(result.items[0].props[3].valueType, "bytes4[]");
+    bytes4[] memory fromQuery = bytesToBytes4Array(result.items[0].props[3].value);
+    for(uint i = 0; i < fromQuery.length; i++) {
+      if(uint32(fromQuery[i]) == 0) continue;
+      assertEq(fromQuery[i], type(IMessage).interfaceId);
+    }
   }
 
   function testProperties(string memory _msg1, string memory _msg2) public {
@@ -94,5 +101,25 @@ contract PostBrowserTest is Test {
   // Thanks ChatGPT!
   function stringEqual(string memory a, string memory b) public pure returns(bool) {
     return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
+  }
+
+  // Thanks ChatGPT!
+  function bytesToBytes4Array(bytes memory input) public pure returns (bytes4[] memory) {
+    require(input.length % 4 == 0, "Input bytes length must be a multiple of 4.");
+
+    uint256 arrayLength = input.length / 4;
+    bytes4[] memory output = new bytes4[](arrayLength);
+
+    for (uint256 i = 0; i < arrayLength; i++) {
+      bytes4 currentBytes4;
+
+      for (uint256 j = 0; j < 4; j++) {
+        currentBytes4 |= (bytes4(input[i * 4 + j]) >> (j * 8));
+      }
+
+      output[i] = currentBytes4;
+    }
+
+    return output;
   }
 }
