@@ -3,7 +3,6 @@ pragma solidity ^0.8.19;
 
 import "forge-std/Script.sol";
 import "../src/PostV1.sol";
-import "../src/ReplyStatusBrowser.sol";
 
 contract Deploy is Script {
   function run() external {
@@ -13,9 +12,6 @@ contract Deploy is Script {
     PostV1Factory factory = new PostV1Factory();
     // Create a post so that all posts have a verified contract
     factory.createNew("Hello", address(0));
-
-    // The browser will be used too
-    new ReplyStatusBrowser();
 
     vm.stopBroadcast();
   }

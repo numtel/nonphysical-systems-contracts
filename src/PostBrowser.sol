@@ -3,8 +3,6 @@ pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import "./ReplyBrowser.sol";
-import "./ReplyStatusBrowser.sol";
 import "./browser/IFetch.sol";
 import "./browser/IFetchReplies.sol";
 

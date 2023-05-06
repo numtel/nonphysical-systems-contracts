@@ -16,5 +16,8 @@ $ forge test -vv
 $ cp .env.example .env
 $ nano .env
 $ source .env
-$ forge script script/PostV1.s.sol:Deploy --rpc-url $MUMBAI_RPC_URL --broadcast --verify -vvvv
+# Deploy a PostV1Factory and an example first post to mumbai testnet
+$ npm run deploy:PostV1
+# Deploy a PostBrowser with all available fetchers/replyFetchers to mumbai testnet
+$ npm run deploy:PostBrowser
 ```
