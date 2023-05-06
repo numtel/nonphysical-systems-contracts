@@ -7,6 +7,7 @@ import "../src/PostV1.sol";
 import "../src/browser/FetchMessage.sol";
 import "../src/browser/FetchMessageEditable.sol";
 import "../src/browser/FetchAllowReplies.sol";
+import "../src/browser/FetchAllowRepliesStatus.sol";
 import "../src/browser/FetchRepliesStatus.sol";
 
 contract PostBrowserTest is Test {
@@ -51,25 +52,28 @@ contract PostBrowserTest is Test {
     PostV1 root = factory.createNew(_msg1, address(0));
     factory.createNew(_msg2, address(root));
 
-    address[] memory fetchers = new address[](3);
+    address[] memory fetchers = new address[](4);
     fetchers[0] = address(new FetchMessage());
     fetchers[1] = address(new FetchMessageEditable());
     fetchers[2] = address(new FetchAllowReplies());
+    fetchers[3] = address(new FetchAllowRepliesStatus());
     address[] memory replyFetchers = new address[](0);
     PostBrowser browser = new PostBrowser(fetchers, replyFetchers);
 
     bytes4[] memory interfaces = browser.matchingInterfaces(address(root));
-    assertEq(interfaces.length, 3);
+    assertEq(interfaces.length, 4);
     for(uint i = 0; i < interfaces.length; i++) {
       // Don't enforce order
       assertEq(interfaces[i] == type(IMessage).interfaceId
         || interfaces[i] == type(IMessageEditable).interfaceId
-        || interfaces[i] == type(IAllowReplies).interfaceId, true);
+        || interfaces[i] == type(IAllowReplies).interfaceId
+        || interfaces[i] == type(IAllowRepliesStatus).interfaceId
+      , true);
     }
 
 
     IFetch.Property[] memory props = browser.properties(address(root));
-    assertEq(props.length, 5);
+    assertEq(props.length, 7);
     for(uint i = 0; i < props.length; i++) {
       // Don't enforce prop order
       if(stringEqual(props[i].key, "message")) {
@@ -92,6 +96,12 @@ contract PostBrowserTest is Test {
 
         assertEq(addr, address(this));
       } else if(stringEqual(props[i].key, "replyCount")) {
+        assertEq(props[i].valueType, "uint256");
+        assertEq(uint256(bytes32(props[i].value)), 1);
+      } else if(stringEqual(props[i].key, "replyCountLTZero")) {
+        assertEq(props[i].valueType, "uint256");
+        assertEq(uint256(bytes32(props[i].value)), 0);
+      } else if(stringEqual(props[i].key, "replyCountGTEZero")) {
         assertEq(props[i].valueType, "uint256");
         assertEq(uint256(bytes32(props[i].value)), 1);
       }
