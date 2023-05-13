@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "./browser/IFetch.sol";
 import "./browser/IFetchReplies.sol";
 
-contract PostBrowser {
+contract PostBrowser is Ownable {
   using EnumerableSet for EnumerableSet.AddressSet;
   EnumerableSet.AddressSet private fetchers;
   // Not an AddressSet because the order is important
@@ -26,8 +27,7 @@ contract PostBrowser {
     uint lastScanned;
   }
 
-  // TODO add/remove fetchers after init
-  constructor(address[] memory _fetchers, address[] memory _replyFetchers) {
+  constructor(address[] memory _fetchers, address[] memory _replyFetchers) Ownable() {
     for(uint i = 0; i < _fetchers.length; i++) {
       fetchers.add(_fetchers[i]);
     }
@@ -36,6 +36,22 @@ contract PostBrowser {
 
   function listFetchers() external view returns(address[] memory) {
     return fetchers.values();
+  }
+
+  function addFetchers(address[] memory toAdd) external onlyOwner {
+    for(uint i = 0; i < toAdd.length; i++) {
+      fetchers.add(toAdd[i]);
+    }
+  }
+
+  function removeFetchers(address[] memory toRemove) external onlyOwner {
+    for(uint i = 0; i < toRemove.length; i++) {
+      fetchers.remove(toRemove[i]);
+    }
+  }
+
+  function addReplyFetcher(address toAdd) external onlyOwner {
+    replyFetchers.push(toAdd);
   }
 
   function properties(address item) public view returns(IFetch.Property[] memory out) {
@@ -80,8 +96,8 @@ contract PostBrowser {
     uint fetchCount,
     bool reverseScan
   ) external view returns(IFetchReplies.RepliesResponse memory out) {
-    for(uint i = 0; i < fetchers.length(); i++) {
-      IFetchReplies fetcher = IFetchReplies(replyFetchers[i]);
+    for(uint i = replyFetchers.length; i > 0; i--) {
+      IFetchReplies fetcher = IFetchReplies(replyFetchers[i - 1]);
       if(!IERC165(post).supportsInterface(fetcher.interfaceId())) continue;
       out = fetcher.fetchReplies(post, startIndex, fetchCount, reverseScan);
       for(uint j = 0; j < out.items.length; j++) {

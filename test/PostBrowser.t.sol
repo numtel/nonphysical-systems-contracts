@@ -12,19 +12,23 @@ import "../src/browser/FetchRepliesStatus.sol";
 
 contract PostBrowserTest is Test {
   function testReplies(string memory _msg1, string memory _msg2, int32 status1) public {
-    PostV1Factory factory = new PostV1Factory();
-    PostV1 root = factory.createNew(_msg1, address(0));
-    PostV1 child1 = factory.createNew(_msg2, address(root));
-    PostV1.ReplyStatus[] memory setStatus1 = new PostV1.ReplyStatus[](1);
-    setStatus1[0].item = address(child1);
-    setStatus1[0].status = status1;
-    root.setReplyStatus(setStatus1);
-
     address[] memory fetchers = new address[](1);
     fetchers[0] = address(new FetchMessage());
     address[] memory replyFetchers = new address[](1);
     replyFetchers[0] = address(new FetchRepliesStatus(type(int32).min));
     PostBrowser browser = new PostBrowser(fetchers, replyFetchers);
+
+    PostV1Factory factory = new PostV1Factory();
+    PostV1 root = factory.createNew(_msg1, address(0));
+
+    IFetchReplies.RepliesResponse memory resultEmpty = browser.fetchReplies(address(root), 0, 10, false);
+    assertEq(resultEmpty.items.length, 0);
+
+    PostV1 child1 = factory.createNew(_msg2, address(root));
+    PostV1.ReplyStatus[] memory setStatus1 = new PostV1.ReplyStatus[](1);
+    setStatus1[0].item = address(child1);
+    setStatus1[0].status = status1;
+    root.setReplyStatus(setStatus1);
 
     IFetchReplies.RepliesResponse memory result = browser.fetchReplies(address(root), 0, 10, false);
     assertEq(result.items.length, 1);

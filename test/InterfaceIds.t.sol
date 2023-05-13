@@ -11,10 +11,10 @@ import "../src/IMessageEditable.sol";
 contract InterfaceIdsTest is Test {
   function testPrintInterfaceIds() public view {
     console.log("{ \"interfaceIds\": {");
-    console.log("\"IAllowReplies\": \"%s\",", vm.toString(abi.encodePacked(type(IAllowReplies).interfaceId)));
-    console.log("\"IAllowRepliesStatus\": \"%s\",", vm.toString(abi.encodePacked(type(IAllowRepliesStatus).interfaceId)));
-    console.log("\"IMessage\": \"%s\",", vm.toString(abi.encodePacked(type(IMessage).interfaceId)));
-    console.log("\"IMessageEditable\": \"%s\"", vm.toString(abi.encodePacked(type(IMessageEditable).interfaceId)));
+    console.log("\"%s\": \"IAllowReplies\",", vm.toString(abi.encodePacked(type(IAllowReplies).interfaceId)));
+    console.log("\"%s\": \"IAllowRepliesStatus\",", vm.toString(abi.encodePacked(type(IAllowRepliesStatus).interfaceId)));
+    console.log("\"%s\": \"IMessage\",", vm.toString(abi.encodePacked(type(IMessage).interfaceId)));
+    console.log("\"%s\": \"IMessageEditable\"", vm.toString(abi.encodePacked(type(IMessageEditable).interfaceId)));
     console.log("} }");
   }
 }
